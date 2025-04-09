@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: tigo_db
+      MYSQL_USER: tigo_user
+      MYSQL_PASSWORD: tigo_pass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tigo_db
+      SPRING_DATASOURCE_USERNAME: tigo_user
+      SPRING_DATASOURCE_PASSWORD: tigo_pass
+      SPRING_DEVTOOLS_REMOTE_SECRET: mysecret
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+    volumes:
+      - ./backend:/app
+      - ~/.m2:/root/.m2
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
